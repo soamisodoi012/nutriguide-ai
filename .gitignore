@@ -1,2 +1,5 @@
+# Exclude virtual environment folder
+nutriguide-env-312/
+
+# Exclude environment variable file
 backend/.env
-/nutriguide-env-312
