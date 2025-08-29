@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - NutriGuide AI</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/auth.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">🍎</span>
+                <h1>NutriGuide AI</h1>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+                <span id="user-greeting" class="user-greeting"></span>
+                <button id="logout-btn" class="btn-secondary">Logout</button>
+            </nav>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="profile-card">
+            <h2>Your Profile</h2>
+            <div id="profile-info">
+                <p><strong>Name:</strong> <span id="profile-name"></span></p>
+                <p><strong>Email:</strong> <span id="profile-email"></span></p>
+                <p><strong>Member since:</strong> <span id="profile-joined"></span></p>
+            </div>
+        </div>
+        
+        <div class="profile-card">
+            <h2>Your Preferences</h2>
+            <div id="saved-preferences">
+                <p><strong>Diet Type:</strong> <span id="pref-diet"></span></p>
+                <p><strong>Health Goal:</strong> <span id="pref-goal"></span></p>
+                <p><strong>Food Preferences:</strong> <span id="pref-cuisines"></span></p>
+                <p><strong>Allergies/Restrictions:</strong> <span id="pref-allergies"></span></p>
+            </div>
+        </div>
+        
+        <div class="profile-card">
+            <h2>Meal History</h2>
+            <div id="meal-history">
+                <p>Your recently viewed meals will appear here.</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>NutriGuide AI &copy; 2025 | Food recommendations powered by AI</p>
+    </footer>
+
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/profile.js"></script>
+</body>
+</html>

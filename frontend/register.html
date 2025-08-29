@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - NutriGuide AI</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/auth.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">🍎</span>
+                <h1>NutriGuide AI</h1>
+            </div>
+            <nav>
+                <a href="index.html" class="btn-secondary">Back to Home</a>
+            </nav>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2>Create an Account</h2>
+                <p>Join us to get personalized food recommendations</p>
+            </div>
+            
+            <form class="auth-form" id="register-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" minlength="6" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input type="password" id="confirm-password" name="confirm-password" required>
+                </div>
+                
+                <button type="submit" class="btn-primary" style="width: 100%;">Create Account</button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Already have an account? <a href="login.html">Login</a></p>
+            </div>
+            
+            <div id="auth-error" class="error" style="display: none;"></div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>NutriGuide AI &copy; 2023 | Food recommendations powered by AI</p>
+    </footer>
+
+    <script src="scripts/auth.js"></script>
+    <script>
+        document.getElementById('register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                document.getElementById('auth-error').textContent = 'Passwords do not match';
+                document.getElementById('auth-error').style.display = 'block';
+                return;
+            }
+            
+            try {
+                const auth = new AuthService();
+                const result = await auth.register(name, email, password);
+                
+                if (result.success) {
+                    window.location.href = 'login.html?message=Registration successful. Please login.';
+                } else {
+                    document.getElementById('auth-error').textContent = result.message;
+                    document.getElementById('auth-error').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('auth-error').textContent = 'An error occurred during registration';
+                document.getElementById('auth-error').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
