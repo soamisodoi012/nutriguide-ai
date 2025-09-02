@@ -44,4 +44,4 @@ NutriGuide AI is a full-stack web application that provides intelligent, persona
 - GitHub Actions CI/CD
 - PostgreSQL with persistent storage
 
-# LOOK THE DEMO
+
