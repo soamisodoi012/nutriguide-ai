@@ -10,7 +10,7 @@
 
 NutriGuide AI is a full-stack web application that provides intelligent, personalized meal recommendations based on user preferences, dietary restrictions, and health goals. It leverages the power of OpenAI's API to offer a unique and adaptive nutrition guidance experience.
 
-![NutriGuide AI Demo](https://www.loom.com/share/1d30fc8f036e4dcea43eaeac9ad326f0?sid=6cbc6103-0220-492c-9ea6-8b791b1653a0)
+👉 [NutriGuide AI Demo](https://www.loom.com/share/1d30fc8f036e4dcea43eaeac9ad326f0?sid=6cbc6103-0220-492c-9ea6-8b791b1653a0)
 
 ## ✨ Features
 
