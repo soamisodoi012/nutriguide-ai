@@ -1,7 +1,7 @@
 import os
 import uuid
 import json
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from config import Config
 from database import Database
@@ -11,10 +11,10 @@ from auth import AuthService, token_required
 
 app = Flask(__name__)
 
-# --- Enable CORS globally ---
+# --- Enable CORS globally for your frontend ---
 CORS(
     app,
-    origins=["https://nutriguide-ai.vercel.app"],  
+    resources={r"/*": {"origins": "https://nutriguide-ai.vercel.app"}},
     supports_credentials=True,
     methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"]
@@ -25,19 +25,28 @@ config = Config()
 db = Database()
 recommender = MealRecommender()
 auth_service = AuthService()
-
-# Flag to track DB initialization
 db_initialized = False
 
+# --- Initialize database once ---
 @app.before_request
-def initialize_app_on_first_request():
-    """Initialize the database once on first request"""
+def initialize_db_once():
     global db_initialized
     if not db_initialized:
         db.initialize_database()
         db_initialized = True
 
-# --- Auth routes ---
+# --- Handle preflight OPTIONS requests globally ---
+@app.before_request
+def handle_options_preflight():
+    if request.method == 'OPTIONS':
+        response = make_response()
+        response.headers.add("Access-Control-Allow-Origin", "https://nutriguide-ai.vercel.app")
+        response.headers.add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        response.headers.add("Access-Control-Allow-Credentials", "true")
+        return response
+
+# --- Auth Routes ---
 @app.route('/api/auth/register', methods=['POST'])
 def register():
     try:
@@ -67,7 +76,7 @@ def login():
         app.logger.error(f"Login error: {e}")
         return jsonify({'error': 'Internal server error'}), 500
 
-# --- User routes ---
+# --- User Routes ---
 @app.route('/api/user/preferences', methods=['GET', 'POST'])
 @token_required
 def user_preferences(current_user):
@@ -100,7 +109,7 @@ def user_history(current_user):
         app.logger.error(f"User history error: {e}")
         return jsonify({'error': 'Internal server error'}), 500
 
-# --- Health route ---
+# --- Health Check ---
 @app.route('/api/health', methods=['POST'])
 def health_check():
     return jsonify({'status': 'healthy', 'message': 'NutriGuide API is running'})
@@ -125,10 +134,9 @@ def get_recommendations():
 
         session_id = request.headers.get('X-Session-ID', str(uuid.uuid4()))
         user_id = None
-        if 'Authorization' in request.headers:
-            auth_header = request.headers['Authorization']
-            if auth_header.startswith('Bearer '):
-                user_id = auth_service.verify_token(auth_header[7:])
+        auth_header = request.headers.get('Authorization')
+        if auth_header and auth_header.startswith('Bearer '):
+            user_id = auth_service.verify_token(auth_header[7:])
 
         if user_id:
             db.save_user_preferences(
@@ -159,7 +167,7 @@ def submit_feedback(current_user):
         app.logger.error(f"Error saving feedback: {e}")
         return jsonify({'error': 'Internal server error'}), 500
 
-# --- Admin reset meals ---
+# --- Admin ---
 @app.route('/api/admin/reset-meals', methods=['POST'])
 def reset_meals():
     try:
@@ -170,7 +178,7 @@ def reset_meals():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# --- Error handlers ---
+# --- Error Handlers ---
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': 'Endpoint not found'}), 404
@@ -181,7 +189,5 @@ def internal_error(error):
 
 # --- Run server ---
 if __name__ == '__main__':
-    with app.app_context():
-        db.initialize_database()
     PORT = int(os.environ.get("PORT", 5000))
     app.run(debug=config.DEBUG, host='0.0.0.0', port=PORT)
