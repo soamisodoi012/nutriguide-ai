@@ -10,7 +10,16 @@ from models import UserPreferences
 from auth import AuthService, token_required
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS
+CORS(
+    app,
+    origins=[
+        "https://nutriguide-ai.vercel.app",  # your frontend
+        "http://localhost:3000"               # optional for local dev
+    ],
+    supports_credentials=True,
+    methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"]
+)
 
 # Initialize services
 config = Config()
