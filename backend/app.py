@@ -15,13 +15,24 @@ app = Flask(__name__)
 CORS(
     app,
     origins=[
-        "https://nutriguide-ai.vercel.app",  # production frontend
-        "http://localhost:3000"               # local dev
+        "https://nutriguide-ai.vercel.app",
+        "http://localhost:3000"
     ],
     supports_credentials=True,
     methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"]
 )
+
+# --- Handle OPTIONS globally (preflight) ---
+@app.before_request
+def handle_options_preflight():
+    if request.method == 'OPTIONS':
+        response = make_response()
+        response.headers.add('Access-Control-Allow-Origin', request.headers.get('Origin', '*'))
+        response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
+        return response
 
 # --- Initialize services ---
 config = Config()
