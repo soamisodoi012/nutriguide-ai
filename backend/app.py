@@ -14,10 +14,7 @@ app = Flask(__name__)
 # --- Enable CORS globally ---
 CORS(
     app,
-    origins=[
-        "https://nutriguide-ai.vercel.app",  # frontend
-        "http://localhost:3000"               # local dev
-    ],
+    origins=["https://nutriguide-ai.vercel.app"],  
     supports_credentials=True,
     methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"]
