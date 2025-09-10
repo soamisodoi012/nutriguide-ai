@@ -10,33 +10,46 @@ from models import UserPreferences
 from auth import AuthService, token_required
 
 app = Flask(__name__)
+
+# --- CORS ---
 CORS(
     app,
     origins=[
-        "https://nutriguide-ai.vercel.app",  # your frontend
-        "http://localhost:3000"               # optional for local dev
+        "https://nutriguide-ai.vercel.app",  # production frontend
+        "http://localhost:3000"               # local dev
     ],
     supports_credentials=True,
     methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"]
 )
 
-# Initialize services
+# --- Initialize services ---
 config = Config()
 db = Database()
 recommender = MealRecommender()
 auth_service = AuthService()
 
-# Flag to track database initialization
+# Flag to track DB initialization
 db_initialized = False
 
 @app.before_request
 def initialize_app_on_first_request():
-    """Initialize the application on first request"""
     global db_initialized
     if not db_initialized:
         db.initialize_database()
         db_initialized = True
+
+# --- Helper for OPTIONS requests ---
+@app.before_request
+def handle_options():
+    if request.method == 'OPTIONS':
+        response = app.make_default_options_response()
+        headers = response.headers
+        headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
+        headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+        headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        headers['Access-Control-Allow-Credentials'] = 'true'
+        return response
 
 # --- Auth routes ---
 @app.route('/api/auth/register', methods=['POST'])
@@ -74,8 +87,8 @@ def login():
 def user_preferences(current_user):
     try:
         if request.method == 'GET':
-            preferences = db.get_user_preferences(current_user.id)
-            return jsonify({'preferences': preferences}), 200
+            prefs = db.get_user_preferences(current_user.id)
+            return jsonify({'preferences': prefs}), 200
         else:
             data = request.get_json()
             db.save_user_preferences(
@@ -113,13 +126,7 @@ def get_recommendations():
         data = request.get_json() or {}
         allergies_input = data.get('allergies', [])
         if isinstance(allergies_input, str):
-            if allergies_input.startswith('[') and allergies_input.endswith(']'):
-                try:
-                    allergies = json.loads(allergies_input)
-                except json.JSONDecodeError:
-                    allergies = [allergies_input]
-            else:
-                allergies = [item.strip() for item in allergies_input.split(',') if item.strip()]
+            allergies = [item.strip() for item in allergies_input.split(',') if item.strip()]
         else:
             allergies = allergies_input
 
