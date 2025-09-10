@@ -13,13 +13,17 @@ class Database:
     def get_connection(self):
         conn = None
         try:
-            conn = psycopg2.connect(
-                host=self.config.DB_HOST,
-                database=self.config.DB_NAME,
-                user=self.config.DB_USER,
-                password=self.config.DB_PASSWORD,
-                port=self.config.DB_PORT
-            )
+            connect_params = {
+                "host": self.config.DB_HOST,
+                "database": self.config.DB_NAME,
+                "user": self.config.DB_USER,
+                "password": self.config.DB_PASSWORD,
+                "port": self.config.DB_PORT,
+            }
+            if self.config.SSL_MODE:
+                connect_params["sslmode"] = self.config.SSL_MODE
+
+            conn = psycopg2.connect(**connect_params)
             yield conn
         except Exception as e:
             print(f"Database connection failed: {e}")
